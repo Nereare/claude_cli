@@ -30,7 +30,8 @@ Gem::Specification.new do |spec|
   ]
   spec.require_paths = %w[lib]
 
-  # spec.add_dependency 'uuid', '~> 2.3'
+  spec.add_dependency 'pastel', '~> 0.8'
+  spec.add_dependency 'tty-screen', '~> 0.8'
 
   spec.add_development_dependency 'rake', '~> 13.3'
   spec.add_development_dependency 'rspec', '~> 3.13'
