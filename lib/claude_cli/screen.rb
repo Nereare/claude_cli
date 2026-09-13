@@ -1,3 +1,8 @@
+# frozen_string_literal: true
+
+require 'pastel'
+require 'tty-screen'
+
 module ClaudeCLI
   # The main entry point. Orchestrates the self-refreshing frame loop,
   # owns the Terminal and KeyReader, tracks registered key handlers, and
@@ -6,81 +11,68 @@ module ClaudeCLI
   # the main render block (e.g. to pop up a menu while a live dashboard
   # keeps refreshing underneath).
   class Screen
-    def initialize(interval: 0.5, out: $stdout, in_stream: $stdin,
-                    hide_cursor: true, header: nil, &render_block)
-      @interval     = interval
-      @header       = header
-      @render_block = render_block
+    attr_accessor :header, :printable_handler
+    attr_reader :tick_count, :key_handlers, :interval, :terminal, :key_reader
 
-      @terminal   = Terminal.new(out: out, in_stream: in_stream, hide_cursor: hide_cursor)
-      @key_reader = KeyReader.new(@terminal)
+    # Initialize a new Screen instance.
+    #
+    # @param  header        [String]  The header text to display at the top.
+    # @param  kopts         [Hash]    Additional options.
+    # @option kopts         [Float]   :interval           The refresh interval in seconds (default: `0.5`).
+    # @option kopts         [Proc]    :render_block       A block to call on each refresh, which receives the screen and a buffer to draw into (default: `nil`).
+    # @option kopts         [Proc]    :printable_handler  A block to call for printable keypresses (default: `nil`).
+    def initialize(header = 'Claude CLI', **kopts)
+      @interval          = kopts.fetch(:interval, 0.5)
+      @header            = header
+      @render_block      = kopts.fetch(:render_block, nil)
 
-      @tick_count = 0
-      @running    = false
-      @key_handlers = {}
-      @printable_handler = nil
+      @width, @height    = TTY::Screen.size
+
+      @terminal          = Terminal.new
+      @key_reader        = KeyReader.new(@terminal)
+      @pastel            = Pastel.new
+
+      @tick_count        = 0
+      @running           = false
+      @key_handlers      = {}
+      @printable_handler = kopts.fetch(:printable_handler, nil)
     end
 
-    attr_reader :tick_count, :header, :interval, :terminal, :key_reader
-    attr_accessor :key_handlers, :printable_handler
-
+    # Returns true if the screen is currently running (i.e. the main loop is active).
+    #
+    # @return       [Boolean]         `true` if the screen is running, `false` otherwise.
     def running?
       @running
     end
 
-    def header=(text)
-      @header = text
-    end
-
-    # ---------- keyboard handling (for the main loop) ----------
-
+    # Set action for keypress.
+    #
+    # @param  key   [String, Symbol]  The key to listen for (e.g. `'q'`, `'a'`, `:up`).
+    # @param  block [Proc]            The action to perform when the key is pressed.
     def on_key(key, &callback)
       @key_handlers[key] = callback
     end
 
+    # Remove action for keypress.
+    #
+    # @param  key   [String, Symbol]  The key to stop listening for.
     def remove_key(key)
       @key_handlers.delete(key)
     end
 
-    # ---------- widgets ----------
-    #
-    # Each returns its result directly (blocking until the user
-    # confirms/cancels), and can be called from inside the main render
-    # block without disrupting the outer refresh loop or its handlers.
-
-    def menu(items, title: "Menu", char: "#")
-      Widgets::Menu.new(self, items, title: title, char: char).run
-    end
-
-    def select(options, title: "Select an option", char: "#", validate: nil)
-      Widgets::Select.new(self, options, title: title, char: char, validate: validate).run
-    end
-
-    def text_input(title: "Enter text", char: "#", validate: nil, mask: nil)
-      Widgets::TextInput.new(self, title: title, char: char, validate: validate, mask: mask).run
-    end
-
-    def number_input(title: "Enter a number", char: "#", allow_float: true,
-                      min: nil, max: nil, validate: nil)
-      Widgets::NumberInput.new(
-        self, title: title, char: char, allow_float: allow_float,
-        min: min, max: max, validate: validate
-      ).run
-    end
-
-    # ---------- lifecycle ----------
-
+    # CLI lifecycle.
     def run
       @running = true
       @terminal.enter
 
-      trap("INT") { stop }
+      trap('INT')      { stop }
+      trap('SIGWINCH') { @width, @height = TTY::Screen.size }
 
       while @running
         @tick_count += 1
         buffer = Buffer.new
         draw_header(buffer)
-        @render_block.call(self, buffer) if @render_block
+        @render_block&.call(self, buffer)
 
         @terminal.draw(buffer.to_s)
         key = @key_reader.read(@interval)
@@ -91,18 +83,21 @@ module ClaudeCLI
       @running = false
     end
 
+    # Stop the screen loop.
     def stop
       @running = false
     end
 
-    # ---------- internals used by Widgets::Base ----------
-    # (public so widgets in the same library can call them; not
-    # intended as public API for consumers)
+    private
 
+    # Draw the header line into the buffer.
+    #
+    # @param  buffer  [Buffer]  The buffer to draw into.
     def draw_header(buffer)
       return unless @header && !@header.to_s.empty?
-      buffer.line(@header.to_s)
-      buffer.line("=" * @header.to_s.length)
+
+      buffer.line(@header.to_s) # TODO: Add colorization with `@pastel`.
+      buffer.line('=' * @header.to_s.length)
       buffer.blank
     end
 
