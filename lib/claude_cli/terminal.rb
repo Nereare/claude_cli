@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ClaudeCLI
   # Wraps all raw terminal I/O concerns: entering/exiting raw mode,
   # hiding/showing the cursor, and writing frames. Isolating this makes
@@ -13,7 +15,7 @@ module ClaudeCLI
     end
 
     attr_reader :in_stream
-    alias_method :io, :in_stream
+    alias io in_stream
 
     # Enters raw mode / hides cursor. Reentrant: nested enter/exit pairs
     # (e.g. a widget loop started from within the main loop) are safe.

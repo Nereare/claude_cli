@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ClaudeCLI
   # Reads single keypresses from a Terminal and resolves multi-byte
   # escape sequences (arrows, escape, backspace, enter) into symbols.
@@ -34,7 +36,7 @@ module ClaudeCLI
       seq = first_char
       if @terminal.wait_readable(0.01)
         seq << @terminal.getc
-        seq << @terminal.getc if seq[-1] == "["
+        seq << @terminal.getc if seq[-1] == '['
       end
 
       case seq

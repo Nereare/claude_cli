@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ClaudeCLI
   module Widgets
     # A single-select widget: choose one item from a list using
@@ -13,7 +15,7 @@ module ClaudeCLI
     #           here is mostly useful for things like "must not pick
     #           the disabled item" style checks.
     class Select < Base
-      def initialize(screen, options, title: "Select an option", char: "#", validate: nil)
+      def initialize(screen, options, title: 'Select an option', char: '#', validate: nil)
         super(screen, title: title, char: char)
         @options  = options
         @index    = 0
@@ -25,17 +27,23 @@ module ClaudeCLI
       def render(buffer)
         buffer.box(char: @char, title: @title) do
           @options.each_with_index do |opt, i|
-            marker = (i == @index) ? "> " : "  "
+            marker = i == @index ? '> ' : '  '
             buffer.line("#{marker}#{opt}")
           end
           buffer.blank
-          buffer.line("[Up/Down] move   [Enter] confirm")
+          buffer.line('[Up/Down] move   [Enter] confirm')
         end
       end
 
       def bind_keys
-        on_key(:up)    { @index = (@index - 1) % @options.length; clear_error }
-        on_key(:down)  { @index = (@index + 1) % @options.length; clear_error }
+        on_key(:up) do
+          @index = (@index - 1) % @options.length
+          clear_error
+        end
+        on_key(:down) do
+          @index = (@index + 1) % @options.length
+          clear_error
+        end
         on_key(:enter) { try_confirm }
         on_key("\r")   { try_confirm }
       end

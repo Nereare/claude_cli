@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ClaudeCLI
   # Accumulates the lines of a single frame. Knows how to render plain
   # lines, blanks, and bordered boxes. Rendering to a final string is
@@ -8,11 +10,9 @@ module ClaudeCLI
       @lines = []
     end
 
-    def lines
-      @lines
-    end
+    attr_reader :lines
 
-    def line(text = "")
+    def line(text = '')
       @lines << text.to_s
     end
 
@@ -21,7 +21,7 @@ module ClaudeCLI
     end
 
     def blank
-      line("")
+      line('')
     end
 
     # Draws a bordered box around whatever is added to the buffer inside
@@ -35,7 +35,7 @@ module ClaudeCLI
     # width:   inner content width (default: longest inner line, or 40)
     # padding: spaces around content, left/right (default 1)
     # title:   optional title centered into the top border
-    def box(char: "#", width: nil, padding: 1, title: nil)
+    def box(char: '#', width: nil, padding: 1, title: nil)
       before = @lines.length
       yield if block_given?
       inner_lines = @lines.slice!(before..-1) || []

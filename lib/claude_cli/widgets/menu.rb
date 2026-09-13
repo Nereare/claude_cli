@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ClaudeCLI
   module Widgets
     # A main menu widget with settable hotkeys.
@@ -9,7 +11,7 @@ module ClaudeCLI
     #   choice = Widgets::Menu.new(screen, items, title: "Main Menu").run
     #   # => the :key of the chosen item, e.g. "s"
     class Menu < Base
-      def initialize(screen, items, title: "Menu", char: "#")
+      def initialize(screen, items, title: 'Menu', char: '#')
         super(screen, title: title, char: char)
         @items = items
       end

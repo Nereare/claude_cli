@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ClaudeCLI
   # Normalizes the various shapes a `validate:` callable can return into
   # a consistent [ok, message] pair.
@@ -9,7 +11,7 @@ module ClaudeCLI
   #   [true, ...]          -> [true, nil]
   #   [false, "message"]   -> [false, "message"]
   module Validation
-    DEFAULT_MESSAGE = "Invalid value".freeze
+    DEFAULT_MESSAGE = 'Invalid value'
 
     def self.run(validator, value)
       return [true, nil] unless validator

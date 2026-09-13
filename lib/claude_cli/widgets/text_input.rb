@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ClaudeCLI
   module Widgets
     # A free-text input widget. Type characters, backspace to edit,
@@ -15,9 +17,9 @@ module ClaudeCLI
     #   - [false, "message"]        -> invalid, explicit message
     #   - [true, ...]               -> valid
     class TextInput < Base
-      def initialize(screen, title: "Enter text", char: "#", validate: nil, mask: nil)
+      def initialize(screen, title: 'Enter text', char: '#', validate: nil, mask: nil)
         super(screen, title: title, char: char)
-        @buffer   = +""
+        @buffer   = +''
         @validate = validate
         @mask     = mask # optional char to display instead of typed text, e.g. "*"
       end
@@ -29,7 +31,7 @@ module ClaudeCLI
         buffer.box(char: @char, title: @title) do
           buffer.line("> #{display}_")
           buffer.blank
-          buffer.line("[Enter] confirm   [Esc] cancel")
+          buffer.line('[Enter] confirm   [Esc] cancel')
         end
       end
 
@@ -37,8 +39,14 @@ module ClaudeCLI
         on_key(:enter)     { try_confirm }
         on_key("\r")       { try_confirm }
         on_key(:escape)    { finish(nil) }
-        on_key(:backspace) { @buffer.chop!; clear_error }
-        on_key("\u007f")   { @buffer.chop!; clear_error }
+        on_key(:backspace) do
+          @buffer.chop!
+          clear_error
+        end
+        on_key("\u007f") do
+          @buffer.chop!
+          clear_error
+        end
 
         on_printable do |k|
           if k.is_a?(String) && k.length == 1 && k.match?(/[[:print:]]/)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ClaudeCLI
   module Widgets
     # Base class for interactive widgets (Menu, Select, TextInput,
@@ -13,7 +15,7 @@ module ClaudeCLI
     # and call #finish(value) when the widget has a result, or
     # #finish(nil) to cancel.
     class Base
-      def initialize(screen, title:, char: "#")
+      def initialize(screen, title:, char: '#')
         @screen = screen
         @title  = title
         @char   = char
@@ -79,6 +81,7 @@ module ClaudeCLI
 
       def render_error(buffer)
         return unless @error
+
         buffer.blank
         buffer.line("! #{@error}")
       end
