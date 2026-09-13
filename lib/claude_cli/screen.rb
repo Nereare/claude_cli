@@ -18,11 +18,12 @@ module ClaudeCLI
     #
     # @param  header        [String]  The header text to display at the top.
     # @param  kopts         [Hash]    Additional options.
-    # @option kopts         [Float]   :interval           The refresh interval in seconds (default: `0.5`).
-    # @option kopts         [Proc]    :render_block       A block to call on each refresh, which receives the screen and a buffer to draw into (default: `nil`).
-    # @option kopts         [Proc]    :printable_handler  A block to call for printable keypresses (default: `nil`).
+    # @option kopts         [Float]           :interval           The refresh interval in seconds (default: `0.5`).
+    # @option kopts         [Symbol, String]  :color              The color for the header text (default: `:blue`).
+    # @option kopts         [Proc]            :render_block       A block to call on each refresh, which receives the screen and a buffer to draw into (default: `nil`).
+    # @option kopts         [Proc]            :printable_handler  A block to call for printable keypresses (default: `nil`).
     def initialize(header = 'Claude CLI', **kopts)
-      @interval          = kopts.fetch(:interval, 0.5)
+      @interval          = kopts.fetch(:interval, 0.034) # Approximately 30fps.
       @header            = header
       @render_block      = kopts.fetch(:render_block, nil)
 
@@ -30,7 +31,8 @@ module ClaudeCLI
 
       @terminal          = Terminal.new
       @key_reader        = KeyReader.new(@terminal)
-      @pastel            = Pastel.new
+      @pastel            = Pastel.new(eachline: "\n")
+      theme_color(kopts.fetch(:color, :blue))
 
       @tick_count        = 0
       @running           = false
@@ -90,14 +92,37 @@ module ClaudeCLI
 
     private
 
+    def wrap_text(text)
+      text.gsub(/(.{1,#{@width - 2}})(\s+|\Z)/, "\\1\n").strip
+    end
+
+    # Set the theme color for the CLI.
+    #
+    # @param  color  [Symbol, String]  The color to set (default: `:blue`). Valid colors are those supported by the Pastel gem.
+    def theme_color(color)
+      # Normalize color to a symbol and check if it's a valid pastel color.
+      main_color = color.downcase.to_sym
+      main_color = :blue unless @pastel.valid?(color)
+      supp_color = "bright_#{color}".downcase.to_sym
+
+      # Set custom pastel styles
+      @pastel.alias_color(:header, main_color, :bold)
+      @pastel.alias_color(:highlight, supp_color)
+      # Set currency pastel style
+      if color == :yellow
+        @pastel.alias_color(:money, :white, :bold, :on_yellow)
+      else
+        @pastel.alias_color(:money, :yellow)
+      end
+    end
+
     # Draw the header line into the buffer.
     #
     # @param  buffer  [Buffer]  The buffer to draw into.
     def draw_header(buffer)
       return unless @header && !@header.to_s.empty?
 
-      buffer.line(@header.to_s) # TODO: Add colorization with `@pastel`.
-      buffer.line('=' * @header.to_s.length)
+      buffer.line(@pastel.header(wrap_text("# #{@header} #")))
       buffer.blank
     end
 
