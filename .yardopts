@@ -1,0 +1,25 @@
+--title "Ruby Adventure Framework"
+--markup markdown
+--plugin rspec
+--private
+--exclude .github/
+--exclude bin/
+--exclude spec/
+--exclude .editorconfig
+--exclude .gitattributes
+--exclude .gitignore
+--exclude .rspec
+--exclude .rubucop.yml
+--exclude .ruby-version
+--exclude "..gem"
+--exclude "..gemspec"
+--exclude "CHANGELOG."
+--exclude "CODE-OF-CONDUCT."
+--exclude "Gemfile."
+--exclude Rakefile
+--exclude util.sh
+-
+CONTRIBUTING.md
+LICENSE.md
+docs/**/*
+rspec/**/*

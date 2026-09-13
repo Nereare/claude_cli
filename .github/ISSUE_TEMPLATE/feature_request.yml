@@ -1,0 +1,50 @@
+name: 🛠️ Request a Feature
+description: Request the implementation of some feature into the project.
+title: "[Feature Request]: "
+labels:
+  - enhancement
+type: feature
+body:
+  - type: markdown
+    attributes:
+      value: We're glad you wish to see this project improve this project further!
+  - type: input
+    id: issue
+    attributes:
+      label: Issue ID (optional)
+      description: If there is an error associated with this feature request, please informe its ID.
+      placeholder: "#1234"
+    validations:
+      required: false
+  - type: textarea
+    id: feature
+    attributes:
+      label: Describe the desired feature
+      description: Briefly describe what feature you wish to see implemented.
+      placeholder: Feature description...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Have you tried using any of the already in-place functionalities to replicate the feature intended? If so, how?
+      placeholder: Alternatives tried...
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Project version in use
+      description: What is the current version you are using?
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to abide by our [Code of Conduct](https://www.contributor-covenant.org/version/3/0/code_of_conduct/).
+      options:
+        - label: I agree to abide by this project's Code of Conduct
+          required: true

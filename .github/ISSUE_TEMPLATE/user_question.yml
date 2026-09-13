@@ -1,0 +1,26 @@
+name: ❓ User Question
+description: Please, ask us!
+title: "[Question]: "
+labels:
+  - question
+type: question
+body:
+  - type: markdown
+    attributes:
+      value: Is there something we can enlighten to you?
+  - type: textarea
+    id: question
+    attributes:
+      label: What is your question?
+      description: Explain what troubles you...
+      placeholder: Question...
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to abide by our [Code of Conduct](https://www.contributor-covenant.org/version/3/0/code_of_conduct/).
+      options:
+        - label: I agree to abide by this project's Code of Conduct
+          required: true

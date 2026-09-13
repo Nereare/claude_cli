@@ -1,0 +1,56 @@
+name: 🪲 Report a Bug
+description: Report us a bug so we can try and fix it!
+title: "[Bug]: "
+labels:
+  - bug
+type: bug
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for taking your time to help us improve the project!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Describe the bug
+      description: Briefly describe the error and what you expect was to happen.
+      placeholder: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: how-to-reproduce
+    attributes:
+      label: How to replicate
+      description: Describe a step-by-step of what you did that caused the bug.
+      placeholder: Steps...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Project version in use
+      description: What is the current version you are using?
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: In what OS you are running this project?
+    validations:
+      required: true
+  - type: textarea
+    id: other
+    attributes:
+      label: Other information
+      description: Is there any other information that could be useful?
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to abide by our [Code of Conduct](https://www.contributor-covenant.org/version/3/0/code_of_conduct/).
+      options:
+        - label: I agree to abide by this project's Code of Conduct
+          required: true
