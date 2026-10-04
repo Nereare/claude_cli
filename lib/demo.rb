@@ -15,20 +15,35 @@ screen.run do |_s, buffer|
 end
 =end
 
-def run
-  print "\e[?25l"
-  trap('INT') { @running = false }
-  @running = true
+module ClaudeCLI
+  # Foo
+  class Screen
+    HIDE  = "\e[?25l"
+    SHOW  = "\e[?25h\n"
+    CLEAR = "\e[H\e[0J"
 
-  while @running
-    lines = []
-    lines << "Tick: #{Time.now.strftime('%H:%M:%S')}"
-    print "\e[H\e[0J"
-    print lines.join("\n")
-    sleep 0.5
+    attr_accessor :lines
+
+    # Bar
+    def initialize(*lines)
+      @lines = lines
+    end
+
+    # Bar
+    def run
+      print HIDE
+      loop do
+        @lines[0] = "Tick: #{Time.now.strftime('%H:%M:%S')}"
+        trap('INT') { return nil }
+        print CLEAR
+        print @lines.join("\n")
+        sleep 0.5
+      end
+    ensure
+      print SHOW
+    end
   end
-ensure
-  print "\e[?25h\n"
 end
 
-run
+s = ClaudeCLI::Screen.new
+s.run
